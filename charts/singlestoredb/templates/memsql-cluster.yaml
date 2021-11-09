@@ -1,0 +1,69 @@
+apiVersion: memsql.com/v1alpha1
+kind: MemsqlCluster
+metadata:
+  name: {{ .Values.memsqlCluster.name }}
+spec:
+  {{ if .Values.memsqlCluster.license }}
+  license: {{ .Values.memsqlCluster.license }}
+  {{- else}}
+  licenseSecret:
+    name: "{{ .Values.memsqlCluster.licenseSecret.name }}"
+    key: "{{ .Values.memsqlCluster.licenseSecret.key }}"
+  {{- end}}
+
+  {{ if .Values.memsqlCluster.adminHashedPassword }}
+  adminHashedPassword: "{{ .Values.memsqlCluster.adminHashedPassword }}"
+  {{- else}}
+  adminHashedPasswordSecret:
+    name: "{{ .Values.memsqlCluster.adminHashedPasswordSecret.name }}"
+    key: "{{ .Values.memsqlCluster.adminHashedPasswordSecret.key }}"
+  {{- end}}
+
+  nodeImage:
+    repository: {{ .Values.nodeImageRepo }}
+    tag: {{ .Values.nodeImageTag }}
+
+  redundancyLevel: {{ .Values.memsqlCluster.redundancyLevel -}}
+
+{{/*  {{ if .Values.memsqlCluster.aggregatorSpec -}} aggregatorSpec:*/}}
+
+  {{ if .Values.memsqlCluster.aggregatorSpec -}} aggregatorSpec:
+{{ toYaml .Values.memsqlCluster.aggregatorSpec | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.leafSpec -}} leafSpec:
+{{ toYaml .Values.memsqlCluster.leafSpec | indent 4 }}
+  {{- end }}
+
+{{/*https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/advanced-service-configuration/*/}}
+  {{ if .Values.memsqlCluster.serviceSpec -}} serviceSpec:
+{{ toYaml .Values.memsqlCluster.serviceSpec | indent 4 }}
+  {{- end }}
+
+{{/*https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/backups/*/}}
+  {{ if .Values.memsqlCluster.backupSpec -}} backupSpec:
+{{ toYaml .Values.memsqlCluster.backupSpec | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.objectOverrides -}} objectOverrides:
+{{ toYaml .Values.memsqlCluster.objectOverrides | indent 4 }}
+  {{- end }}
+
+{{/*https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/memsql-pod-scheduling/*/}}
+  {{ if .Values.memsqlCluster.schedulingDetails -}} schedulingDetails:
+{{ toYaml .Values.memsqlCluster.schedulingDetails | indent 4 }}
+  {{- end }}
+
+{{/*https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/disaster-recovery/*/}}
+  {{ if .Values.memsqlCluster.replicationSpec -}} replicationSpec:
+{{ toYaml .Values.memsqlCluster.replicationSpec | indent 4 }}
+  {{- end }}
+
+{{/*https://docs.singlestore.com/db/v7.5/en/reference/memsql-operator-reference/configure-tls-ssl-websocket.html*/}}
+  {{ if .Values.memsqlCluster.secureConnectionSpec -}} secureConnectionSpec:
+{{ toYaml .Values.memsqlCluster.secureConnectionSpec | indent 4 }}
+  {{- end }}
+
+  {{ if .Values.memsqlCluster.monitoringSpec -}} monitoringSpec:
+{{ toYaml .Values.memsqlCluster.monitoringSpec | indent 4 }}
+  {{- end }}

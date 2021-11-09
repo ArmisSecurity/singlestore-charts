@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.memsqlOperatorDeployment.name }}
+  annotations:
+    productVersion: {{ .Values.nodeImageVersion }}
+spec:
+  replicas: {{ .Values.memsqlOperatorDeployment.replicas }}
+  selector:
+    matchLabels:
+      name: {{ .Values.memsqlOperatorDeployment.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.memsqlOperatorDeployment.name }}
+    spec:
+      serviceAccountName: {{ .Values.memsqlOperatorDeployment.serviceAccountName }}
+      containers:
+        - name: memsql-operator
+          image: {{ .Values.operatorImage }}
+          imagePullPolicy: Always
+          args:
+            {{ if .Values.memsqlOperatorDeployment.additionalArgs }}
+            {{- range $a := .Values.memsqlOperatorDeployment.additionalArgs -}}
+            - {{ $a | quote }}
+            {{ end }}
+            {{- end -}}
+            {{ if ne .Values.coresPerUnit "" -}}
+            - "--cores-per-unit"
+            - "{{ .Values.coresPerUnit }}"
+            {{- end }}
+            {{ if ne .Values.memoryPerUnit "" -}}
+            - "--memory-per-unit"
+            - "{{ .Values.memoryPerUnit }}"
+            {{- end }}
+            {{ if ne .Values.overpackFactor "" -}}
+            - "--overpack-factor"
+            - "{{ .Values.overpackFactor }}"
+            {{- end }}
+            - "--merge-service-annotations"
+            - "--cluster-id"
+            - "{{ .Values.memsqlCluster.name }}"
+            - "--fs-group-id"
+            - "{{ .Values.fsGroup | required "must provide fsGroup id. Use the starting value in current namespace's 'openshift.io/sa.scc.supplemental-groups' annotation"}}"
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: {{ .Values.memsqlOperatorDeployment.name }}

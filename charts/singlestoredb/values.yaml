@@ -1,0 +1,77 @@
+# fsGroup is the only parameter that you have to set. Set it to the starting value of
+fsGroup: "5555"
+
+# https://hub.docker.com/r/memsql/operator/tags
+operatorImage: memsql/operator:1.2.5-83e8133a
+
+# nodeImageVersion should be consistent with nodeImageTag
+nodeImageVersion: 7.5.12
+nodeImageTag: centos-7.5.12-3112a491c2
+nodeImageRepo: memsql/node
+
+# Make sure to use string for the following three values
+coresPerUnit: "8"
+memoryPerUnit: "32"
+overpackFactor: "0"
+
+memsqlOperatorDeployment:
+  serviceAccountName: memsql-operator
+  name: memsql-operator
+  replicas: 1
+  additionalArgs: []
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+
+memsqlCluster:
+  name: memsql-cluster
+
+  # Must include either license or licenseSecret, but not both.
+  # If both are specified, license will take precedence.
+  license: BDA4QclAA==
+
+  # Must include either adminHashedPassword or adminHashedPasswordSecret, but not both.
+  # How to generate hashed password in python 2.x
+  # from hashlib import sha1
+  # print("*" + sha1(sha1('mypassword').digest()).hexdigest().upper())
+  adminHashedPassword: "*FABE5482D5AADF36D028AC443D117BE1180B9725"
+
+  # Change redundancyLevel to 2 if you want to enable high availability.
+  # It is highly recommended you set this value to 2 for production deployments.
+  # Note: You must have an even number of leaf nodes to enable high availability.
+  # Refer to Managing High Availability for more information.
+  redundancyLevel: 2
+
+  aggregatorSpec:
+    # Change count to alter the number of aggregator or leaf nodes in your cluster.
+    count: 2
+    # The height value specifies the vCPU and RAM size of an aggregator or leaf node
+    # where a height of 1 equals 8 vCPU cores and 32 GB of RAM.
+    # The smallest value you can set is 0.5 (4 vCPU cores, 16 GB of RAM).
+    height: 0.5
+    # The storageGB value corresponds to the amount of storage each aggregator or
+    # leaf should request for their persistent data volume.
+    storageGB: 10
+    # The storageClass value specifies which storage class to use for the PersistedVolume in the Kubernetes cluster.
+    # You should change this value to align with the default (or custom) storage class available to your cluster.
+    storageClass: "gp2"
+
+  # See aggregatorSpec
+  leafSpec:
+    count: 2
+    height: 0.5
+    storageGB: 20
+    storageClass: "gp2"
+
+  # See https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/advanced-service-configuration/
+  # serviceSpec:
+
+  # See https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/backups/ for backups
+
+  # See https://docs.singlestore.com/v7.1/reference/memsql-operator-reference/memsql-operator-reference-overview/
+  # For additional configurations, such as serviceSpec, backupSpec, etc.

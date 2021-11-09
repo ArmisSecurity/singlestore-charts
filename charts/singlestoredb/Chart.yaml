@@ -1,0 +1,15 @@
+apiVersion: v2
+description: SingleStore DB
+home: https://singlestore.com
+icon: https://www.singlestore.com/images/components/navbar/logo_main.svg
+keywords:
+- SingleStore DB
+- memsql
+- database
+- operator
+kubeVersion: ^1.11.0-0
+maintainers:
+- email: moshe.zada@armis.com
+  name: Moshe Zada
+name: singlestoredb
+version: 1.0.0
