@@ -47,6 +47,45 @@ memsqlCluster:
   # Refer to Managing High Availability for more information.
   redundancyLevel: 2
 
+  # Users may declare a schedulingDetails section.
+  # This is an optional section that allows scheduling configurations to be set over
+  # different groups of pods via the node selector, affinity / anti-affinity, taints,
+  # and tolerations attributes
+  # https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/memsql-pod-scheduling/
+  schedulingDetails:
+    master:
+      tolerations:
+        - effect: NoSchedule
+          key: singlestore1
+          operator: Equal
+          value: "true"
+        - effect: NoSchedule
+          key: singlestore2
+          operator: Equal
+          value: "true"
+    aggregator:
+      tolerations:
+        - effect: NoSchedule
+          key: singlestore1
+          operator: Equal
+          value: "true"
+        - effect: NoSchedule
+          key: singlestore2
+          operator: Equal
+          value: "true"
+    leaf-ag1:
+      tolerations:
+        - effect: NoSchedule
+          key: singlestore1
+          operator: Equal
+          value: "true"
+    leaf-ag2:
+      tolerations:
+        - effect: NoSchedule
+          key: singlestore2
+          operator: Equal
+          value: "true"
+
   aggregatorSpec:
     # Change count to alter the number of aggregator or leaf nodes in your cluster.
     count: 2
@@ -69,7 +108,8 @@ memsqlCluster:
     storageClass: "gp2"
 
   # See https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/advanced-service-configuration/
-  # serviceSpec:
+  serviceSpec:
+    disableDDLAndDMLService: true
 
   # See https://archived.docs.singlestore.com/v7.1/reference/memsql-operator-reference/backups/ for backups
 
